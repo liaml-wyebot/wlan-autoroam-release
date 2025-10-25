@@ -4,7 +4,8 @@ An automated Wi-Fi roaming analyzer with agentic AI capabilities. Test your wire
 > [!IMPORTANT]
 > **AI Features Require Your Own API Key**: RoamBot needs an LLM provider (OpenAI, Anthropic, OpenRouter, or local Ollama/LM Studio). Basic roaming tests work without AI. See the [AI analysis section](#ai-analysis-roambot) for configuration.
 
-<img width="1239" height="1335" alt="10 0 10 58_8443_ (4)" src="https://github.com/user-attachments/assets/f8b3311d-4a26-4d29-a3e2-623856023649" />
+<img width="1234" height="1338" alt="10 0 10 58_8443_ (5)" src="https://github.com/user-attachments/assets/78c8f4f5-2b20-4a74-b32b-b5a6e9f3356e" />
+
 
 ## Features
 
