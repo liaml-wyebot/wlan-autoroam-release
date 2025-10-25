@@ -21,7 +21,35 @@ An automated Wi-Fi roaming analyzer with agentic AI capabilities. Test your wire
 
 ## Quick Start
 
-### Prerequisites
+### 🚀 One-Line Install (Recommended)
+
+**Automatically download and install for your platform:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
+```
+
+This will:
+- ✅ Detect your architecture (AMD64, ARM64, ARMv7)
+- ✅ Download the latest release
+- ✅ Install to `/usr/local/bin/wlan-autoroam` (accessible system-wide)
+- ✅ Make it executable and ready to use
+
+Then simply run:
+```bash
+sudo wlan-autoroam
+```
+
+Open your browser to `https://localhost:8443` and start testing!
+
+---
+
+### 📦 Manual Installation
+
+<details>
+<summary>Click to expand manual installation steps</summary>
+
+#### Prerequisites
 
 **System Requirements:**
 - Linux (Debian/Ubuntu or similar)
@@ -36,7 +64,7 @@ An automated Wi-Fi roaming analyzer with agentic AI capabilities. Test your wire
 
 Most modern Linux distributions have these installed by default.
 
-### Installation
+#### Installation Steps
 
 1. **Download the binary** from the [latest release](../../releases/latest)
 
@@ -65,6 +93,10 @@ Most modern Linux distributions have these installed by default.
    - Accept the self-signed certificate warning (or provide your own certs)
 
 That's it! See [QUICKSTART.md](QUICKSTART.md) for your first roaming test.
+
+</details>
+
+---
 
 ### Configuration Files
 

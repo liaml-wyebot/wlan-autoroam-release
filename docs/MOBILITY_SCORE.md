@@ -1,111 +1,400 @@
-# Mobility Score
+# WiFi Mobility Score: Technical Overview
 
-The **Mobility Score** is a comprehensive 0-100 rating that evaluates how well a WiFi network is configured for seamless roaming. It analyzes real roaming test data and assigns points across six key categories.
-
-## Score Breakdown (115 points → normalized to 100)
-
-### 🚀 Performance (25 points)
-Measures actual roaming success and speed.
-
-- **Success Rate** (13 points): Percentage of successful roams
-  - 100% success = 13 points
-  - Linear scaling down to 0 points
-  
-- **Roam Speed** (12 points): Average roam duration
-  - ≤100ms = 12 points (Excellent)
-  - ≤200ms = 9 points (Good)
-  - ≤400ms = 6 points (Fair)
-  - ≤800ms = 3 points (Poor)
-  - >800ms = 0 points
-
-### 📡 Roaming Amendments (15 points)
-Evaluates support for 802.11k/v/r roaming standards. **Gradient scoring** rewards partial adoption.
-
-**Enterprise Networks** (802.1X authentication):
-- **802.11k** (Neighbor Reports): 5 points × coverage %
-- **802.11v** (BSS Transition): 5 points × coverage %
-- **802.11r** (Fast Transition): 5 points × coverage %
-
-**Personal Networks** (PSK/SAE authentication):
-- **802.11k**: 7.5 points × coverage %
-- **802.11v**: 7.5 points × coverage %
-- **802.11r**: 0 points (not beneficial without 802.1X key management)
-
-*Example: 67% of APs support 802.11r on enterprise = 3.35 points (67% × 5)*
-
-### 🔄 Configuration Consistency (20 points)
-Networks should be uniformly configured across all APs.
-
-- **Protocol Consistency** (8 points): All APs use the same 802.11k/v/r features
-- **Security Consistency** (7 points): All APs use identical security settings
-- **Data Rate Consistency** (5 points): All APs advertise the same supported rates
-
-Deductions are made for configuration mismatches between APs.
-
-### 📻 RF Health (20 points)
-Evaluates channel planning and radio frequency best practices.
-
-- **Clean Channels** (10 points):
-  - 2.4GHz: Deduct points for non-standard channels (not 1, 6, or 11)
-  - 2.4GHz: Deduct points for overlapping channels
-  - All bands: Reward proper channel separation
-
-- **Channel Widths** (6 points):
-  - Penalize 40MHz on 2.4GHz (causes interference)
-  - Penalize 80MHz on 5GHz (limits capacity in dense deployments)
-  - Penalize 160MHz or 320MHz on 6GHz (unnecessary in most environments)
-
-- **Data Rates** (4 points):
-  - Penalize 802.11b legacy rates (1, 2, 5.5, 11 Mbps)
-
-### 🔧 Technology (15 points)
-Rewards adoption of modern WiFi standards and WPA3 security.
-
-**WiFi Generation** (10 points max):
-- **WiFi 7** (802.11be/EHT): 10 points if any 6GHz APs detected
-- **WiFi 6E** (802.11ax on 6GHz): 10 points if any 6GHz APs detected
-- **WiFi 6** (802.11ax): Up to 5 points (scaled by % coverage across all bands)
-- **WiFi 5** (802.11ac): Up to 1 point (scaled by % coverage)
-- **WiFi 4 or older**: 0 points
-
-**WPA3 Bonus** (5 points):
-- +5 points if **any** WPA3 standard is in use (Enterprise, SAE, or OWE)
-- Encourages modern security adoption
-
-*Example 1: Network has 6GHz APs + WPA3 = 10 points (6E) + 5 points (WPA3) = 15 points total*  
-*Example 2: Network is 100% WiFi 6 (no 6GHz) + WPA3 = 5 points (WiFi 6) + 5 points (WPA3) = 10 points total*  
-*Example 3: Network is 80% WiFi 6 + WPA3 = 4 points (80% × 5) + 5 points (WPA3) = 9 points total*
-
-### 🔒 Security (20 points)
-Evaluates authentication strength. Points based on **strongest** security suite detected.
-
-- **802.1X** (WPA3/WPA2 Enterprise): 20 points
-- **SAE** (WPA3-Personal): 13 points
-- **PSK** (WPA2-Personal): 10 points
-- **OWE** (Enhanced Open): 7 points
-- **Open** (No encryption): 0 points
-
-*WPA3-Enterprise detection: Looks for SHA-256 or SHA-384 in authentication suites*
+**Version:** 1.0  
+**Date:** October 2025  
+**Author:** wlan-autoroam Project
 
 ---
 
-## Letter Grades
+## Executive Summary
 
-| Score | Grade | Rating |
-|-------|-------|--------|
-| 90-100 | A | Excellent |
-| 80-89 | B | Good |
-| 70-79 | C+ | Fair |
-| 60-69 | C | Adequate |
-| 50-59 | D | Poor |
-| 0-49 | F | Critical Issues |
+The WiFi Mobility Score is a comprehensive 0-100 point scoring algorithm designed to evaluate wireless network quality specifically for roaming scenarios. Unlike traditional WiFi assessments that focus solely on signal strength, this scoring system emphasizes **configuration consistency**, **RF planning excellence**, and **actual roaming performance** to provide actionable insights for network administrators.
 
-## Color Coding
-
-- 🟢 **Green** (≥80): Well-optimized network
-- 🟡 **Yellow** (60-79): Room for improvement
-- 🔴 **Red** (<60): Significant issues affecting roaming
+The algorithm has been designed with enterprise WiFi deployments in mind, where seamless roaming is critical for voice, video, and real-time applications.
 
 ---
 
+## Design Philosophy
 
+### Core Principles
+
+1. **Performance is Paramount**: No amount of perfect configuration matters if roaming actually fails. Performance acts as a key factor in the overall assessment.
+
+2. **Configuration Consistency Matters**: Inconsistent AP configurations (different k/v/r support, mismatched channel widths, varying security) create unpredictable roaming behavior.
+
+3. **RF Health Over Signal Strength**: Proper channel planning, appropriate channel widths, and low utilization are more important than raw RSSI values.
+
+4. **Normalized Scoring**: Penalties scale proportionally to deployment size - a 100-AP network isn't unfairly penalized compared to a 2-AP network.
+
+5. **Actionable Warnings**: Every deduction comes with an explanation of what's wrong and why it matters.
+
+---
+
+## Scoring Architecture
+
+### Category Overview
+
+The mobility score evaluates six key areas of WiFi deployment quality:
+
+| Category | Focus Area |
+|----------|------------|
+| **Infrastructure** | 802.11k/v/r roaming protocol deployment |
+| **Consistency** | Configuration uniformity across APs |
+| **Performance** | Actual roaming success and speed |
+| **RF Health** | Channel planning and spectrum usage |
+| **Technology** | WiFi generation and security features |
+| **Security** | Authentication method strength |
+
+Each category is independently assessed and contributes to the overall score based on configurable weights that reflect real-world operational priorities.
+
+---
+
+## Category Breakdown
+
+### 1. Performance
+
+Performance evaluation focuses on two critical metrics:
+
+**Success Rate**
+- Measures the percentage of successful roaming attempts
+- Accounts for complete failures, timeouts, and authentication issues
+- Linear scoring based on success percentage
+
+**Roam Speed**
+- Evaluates average roaming latency
+- Considers application requirements:
+  - VoIP/Video: Requires minimal disruption
+  - Interactive Apps: Moderate tolerance
+  - Background Apps: Higher tolerance acceptable
+- Uses industry-standard thresholds for scoring
+
+Performance plays a unique role in the overall score - it acts as a quality multiplier rather than a simple additive component. This ensures that networks with broken roaming receive appropriately low scores regardless of configuration quality.
+
+---
+
+### 2. Infrastructure - Roaming Amendments
+
+Evaluates deployment of 802.11k/v/r protocols, which are essential for modern WiFi roaming:
+
+**802.11k (Radio Resource Measurement)**
+- Enables neighbor AP discovery
+- Reduces client scanning overhead
+- Provides channel load information
+
+**802.11v (BSS Transition Management)**
+- Allows network-directed roaming
+- Enables AP load balancing
+- Improves client steering decisions
+
+**802.11r (Fast BSS Transition)**
+- Accelerates authentication during roaming
+- Critical for enterprise (802.1X) environments
+- Less impactful for PSK/SAE networks
+
+Scoring methodology differs between Enterprise (802.1X) and Personal (PSK/SAE) networks, as 802.11r provides significant value only when authentication servers are involved.
+
+Partial deployments receive proportional scores to encourage incremental improvements.
+
+---
+
+### 3. Consistency
+
+Configuration uniformity is critical for predictable roaming behavior. The assessment prioritizes based on operational impact:
+
+**Priority 1: Security Uniformity**
+- Inconsistent security configurations can cause roaming failures
+- Clients may refuse to roam between different auth methods
+- WPA2/WPA3 transition mode receives partial credit
+
+**Priority 2: Channel Width Uniformity**
+- Clients expect consistent channel widths within a frequency band
+- Mismatches cause re-association delays
+- Evaluated independently per band (2.4/5/6 GHz)
+
+**Priority 3: Protocol Uniformity**
+- Mixed k/v/r deployment means some APs can't participate in assisted roaming
+- Creates inconsistent user experience
+- Partial uniformity receives proportional scoring
+
+**Priority 4: Data Rate Uniformity**
+- Inconsistent basic rates cause hesitation before roaming
+- Less critical than security/width/protocol consistency
+- Differentiated penalties for basic vs. supported rate mismatches
+
+---
+
+### 4. RF Health
+
+RF planning quality is foundational to good roaming performance.
+
+**Clean Channel Planning**
+- Non-overlapping channel usage
+- Proper channel spacing (1/6/11 on 2.4GHz)
+- Band-specific evaluation
+
+**Appropriate Channel Widths**
+- 2.4GHz: 20MHz recommended (40MHz causes interference)
+- 5GHz: 80MHz typical, 160MHz+ evaluated based on deployment
+- 6GHz: 160MHz typical, 320MHz evaluated for appropriateness
+- Severity-based penalties for problematic configurations
+
+**Channel Utilization** (when QBSS data available)
+- Average utilization percentage
+- Distribution of highly-loaded APs
+- Thresholds based on real-world performance impact
+
+When QBSS data is unavailable, scoring focuses entirely on channel planning and width selection to ensure fair evaluation.
+
+---
+
+### 5. Technology
+
+Evaluates WiFi generation adoption and legacy protocol usage.
+
+**WiFi Generation Assessment**
+- WiFi 7/6E/6: Modern features (OFDMA, BSS coloring, TWT)
+- WiFi 5: Mature, widely deployed
+- WiFi 4: Aging but functional
+- Mixed deployments receive proportional scores
+
+**Security Protocol Tier**
+- WPA3: Modern encryption and authentication
+- WPA2: Industry standard
+- WPA1: Deprecated, security risk
+- Open: Unacceptable for most deployments
+
+**Legacy Rate Detection**
+- 802.11b rates (1/2 Mbps) consume excessive airtime
+- Should be disabled on modern networks
+- Penalty applied when detected
+
+---
+
+### 6. Security
+
+Authentication method strength evaluation based on best-in-class industry standards:
+
+**Enterprise (802.1X)**
+- WPA3-Enterprise: Best available security
+- WPA2-Enterprise: Industry standard
+- Per-user authentication
+- Centralized credential management
+
+**Personal (PSK/SAE)**
+- WPA3-Personal (SAE): Modern, secure
+- WPA2-Personal (PSK): Acceptable for small deployments
+- Shared password model has inherent limitations
+
+**Guest/Open**
+- OWE (Enhanced Open): Encrypted but no authentication
+- Open: Not recommended for any production use
+
+Scoring reflects the security level while acknowledging that different deployment types have different requirements.
+
+---
+
+## Grading Scale
+
+Final scores are converted to letter grades for intuitive understanding:
+
+| Grade | Score Range | Interpretation |
+|-------|-------------|----------------|
+| A+ to A- | 90-100 | Excellent - Production-ready enterprise WiFi |
+| B+ to B- | 80-89 | Good - Solid network with optimization opportunities |
+| C+ to C- | 70-79 | Fair - Functional with notable issues |
+| D+ to D- | 60-69 | Poor - Significant problems requiring remediation |
+| F | 0-59 | Failing - Critical issues making network unsuitable |
+
+---
+
+## Warning System
+
+The scoring system provides actionable feedback through category-specific warnings:
+
+### Infrastructure Warnings
+- Missing or partial k/v/r deployment
+- Identifies specific gaps in roaming protocol support
+
+### Consistency Warnings
+- Security configuration mismatches
+- Channel width inconsistencies per band
+- Data rate configuration issues
+
+### RF Health Warnings
+- Channel overlap detection
+- Inappropriate channel width usage
+- High utilization alerts
+
+### Technology Warnings
+- Aging WiFi generation issues
+- WPA1 protocol detection
+- Legacy rate usage
+
+### Security Warnings
+- Open network detection
+- Weak authentication methods
+- Recommended upgrades
+
+Warnings are designed to guide administrators toward specific remediation actions.
+
+---
+
+## Use Cases
+
+### 1. Network Validation
+
+Post-deployment verification:
+- Confirm AP configuration consistency
+- Validate RF planning
+- Verify roaming functionality
+- Target: Score ≥90 for production environments
+
+### 2. Troubleshooting
+
+Problem identification:
+- Warnings highlight specific issues
+- Category breakdown shows weak areas
+- Enables focused remediation
+
+### 3. Benchmarking
+
+Comparative analysis:
+- Pre/post upgrade assessment
+- Multi-site comparison
+- Vendor evaluation
+
+### 4. Regression Testing
+
+Automated validation:
+- Post-firmware update verification
+- Configuration drift detection
+- New AP compatibility testing
+
+---
+
+## Methodology Highlights
+
+### Normalization
+
+All penalty calculations use percentage-based methods to ensure fairness across deployment sizes. A network with 100 APs and 10% misconfiguration receives the same penalty as a 10-AP network with 10% misconfiguration.
+
+### Performance Multiplier Approach
+
+Rather than adding performance points to configuration points, performance acts as a quality multiplier. This correctly reflects that configuration quality only matters if roaming actually works.
+
+Traditional approach:
+```
+config_score + performance_score = total
+Problem: Perfect config (90) + broken roaming (0) = 90/100 (A-)
+```
+
+Our approach:
+```
+performance_multiplier × config_score = total
+Result: Perfect config × 0% performance = 0/100 (F)
+```
+
+### Piecewise Linear Interpolation
+
+Roaming speed scoring uses application-aware breakpoints rather than simple linear scaling. This creates natural grade boundaries aligned with real-world application requirements.
+
+### Adaptive Scoring
+
+Scoring adapts to available data:
+- Networks without QBSS data aren't penalized
+- PSK networks don't score 802.11r
+- Points redistribute to ensure fair maximum scores
+
+---
+
+## Best Practices
+
+### Achieving High Scores
+
+**Infrastructure (k/v/r)**
+- Deploy 802.11k/v on all APs
+- Enable 802.11r for Enterprise networks
+- Ensure consistent deployment across all APs
+
+**Consistency**
+- Standardize security configurations
+- Use consistent channel widths per band
+- Align protocol support across all APs
+- Standardize rate configurations
+
+**RF Health**
+- Use non-overlapping channels
+- Apply appropriate channel widths for each band
+- Monitor and manage channel utilization
+- Avoid 40MHz on 2.4GHz
+
+**Technology**
+- Deploy modern WiFi generations (6/6E/7)
+- Disable 802.11b legacy rates
+- Use WPA3 when possible
+- Maintain consistent firmware versions
+
+**Security**
+- Use 802.1X for enterprise environments
+- Deploy WPA3 for new installations
+- Avoid Open networks except for specific guest use cases
+
+---
+
+## Limitations
+
+### Current Scope
+
+- **Single SSID Assessment**: Multi-SSID environments require separate evaluation per SSID
+- **Configuration-Based**: Evaluates AP configuration, not client experience
+- **No Spatial Analysis**: Doesn't consider AP placement or coverage patterns
+- **Roaming-Focused**: Optimized for roaming scenarios, not general WiFi quality
+
+### Data Requirements
+
+- Requires roaming test data for performance scoring
+- Benefits from QBSS data for utilization assessment
+- Needs complete AP configuration information
+
+---
+
+## Target Scores by Deployment Type
+
+| Deployment Type | Target Score | Rationale |
+|----------------|--------------|-----------|
+| Enterprise Production | 90+ (A-range) | Mission-critical WiFi requires excellence |
+| SMB Production | 80+ (B-range) | Acceptable for business use |
+| Home/Small Office | 70+ (C-range) | Functional roaming capability |
+| Development/Lab | 60+ (D-range) | Testing environment |
+
+---
+
+## Conclusion
+
+The WiFi Mobility Score provides a comprehensive, consistent method for evaluating wireless network quality specifically for roaming scenarios. By emphasizing actual performance alongside configuration quality, providing actionable warnings, and using normalized scoring methods, it delivers practical value to network administrators seeking to optimize their WiFi deployments.
+
+The system balances technical rigor with operational practicality, making it suitable for enterprise validation, troubleshooting workflows, and ongoing network monitoring.
+
+---
+
+## Appendix: Common Warning Triggers
+
+| Warning Category | Typical Trigger | Recommended Action |
+|-----------------|-----------------|-------------------|
+| k/v/r deployment | Partial or missing protocol support | Enable on all APs |
+| Channel overlap | Non-standard channel usage | Use 1/6/11 on 2.4GHz |
+| Wide channels | 40MHz on 2.4GHz | Reduce to 20MHz |
+| Width mismatch | Mixed widths in single band | Standardize per band |
+| Legacy rates | 1/2 Mbps detected | Disable 802.11b rates |
+| WPA1 detection | Old security protocol | Upgrade to WPA2/WPA3 |
+| Open network | No encryption | Implement WPA2/WPA3 |
+| Mixed generations | WiFi 4/5/6 mix in same deployment | Plan phased upgrades |
+
+---
+
+**For More Information:**
+
+This scoring methodology is implemented in the wlan-autoroam WiFi roaming analysis tool. For licensing inquiries or additional technical details, please contact the project maintainer.
+
+**Document Version:** 1.0 (Public) - October 2025  
+**Copyright:** © 2025 wlan-autoroam Project. All rights reserved.

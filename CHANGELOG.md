@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-25
+
+### Added
+- **One-line installer script** - `curl | sudo bash` for automatic platform detection and installation
+- **Comprehensive mobility scoring system** - 6 categories (Infrastructure, Consistency, RF Health, Technology, Security, Performance)
+- **Warning system** - 26 unique category-specific warnings with UI display
+- **LLM-UI state synchronization** - `/api/get_ui_loaded_run` endpoint and `get_ui_loaded_run()` MCP tool
+- **Performance multiplier** - 0.0-1.0 scalar applied to base score (prevents hiding config issues with good performance)
+- **Normalized percentage-based penalties** - Prevents large deployment bias in scoring
+- **Warnings UI box** - Scrollable display above metrics with category-specific diagnostics
+- **System-wide installation** - Installer puts binary in `/usr/local/bin` (no `./` prefix needed)
+- **Auto-update support** - Re-run installer to upgrade to latest version
+- **Internal whitepaper** - Complete mobility scoring documentation with formulas (source repo only)
+- **Public whitepaper** - Sanitized version for public consumption
+
+### Changed
+- **Mobility scoring algorithm** - Reworked to use weighted categories with normalized penalties
+- **Consistency priorities** - Security (6pts) > Width (6pts) > Protocol (5pts) > Rate (3pts)
+- **Technology scoring** - Now uses `phy_types` field from candidate data (matches AP table)
+- **Technology tooltip** - Shows actual `security_tier` instead of hardcoded "WPA2/older"
+- **Scoring output** - Rounded to 1 decimal place for clean display
+- **Deprecated tools** - Marked `get_latest_summary()` and `get_latest_run_dir()` as deprecated
+- **Recommended workflow** - Updated to `get_ui_loaded_run()` + `list_runs_by_ssid()` pattern
+- **System prompt** - Added comprehensive AVAILABLE TOOLS reference section
+
+### Fixed
+- Technology scoring bug where SHA-256/SHA-384 detection would fail
+- F-string format error in system prompt (curly braces in JSON examples)
+- Technology tooltip showing wrong security tier information
+- Warning deduplication - each warning now appears in only one category
+
+### Documentation
+- Updated OpenAPI spec to v1.1.0
+- Added `/api/get_ui_loaded_run` endpoint documentation
+- Created MOBILITY_SCORE.md with v1.1.0 scoring system
+- Added installer README and usage documentation
+- Updated MCP tool documentation with new workflow patterns
+
 ## [1.0.0] - 2025-10-23
 
 ### Changed
