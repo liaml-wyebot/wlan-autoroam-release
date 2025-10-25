@@ -55,13 +55,13 @@ info "Detecting system architecture..."
 ARCH=$(uname -m)
 case $ARCH in
     x86_64)
-        PLATFORM="linux-amd64"
+        PLATFORM="amd64"
         ;;
     aarch64|arm64)
-        PLATFORM="linux-arm64"
+        PLATFORM="arm64"
         ;;
     armv7l|armhf)
-        PLATFORM="linux-armv7"
+        PLATFORM="armv7"
         ;;
     *)
         error "Unsupported architecture: $ARCH"

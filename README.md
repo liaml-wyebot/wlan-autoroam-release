@@ -1,6 +1,7 @@
 # wlan-autoroam
 
-An automated Wi-Fi roaming analyzer with agentic AI capabilities. Test your wireless network's roaming performance across access points with detailed phase-by-phase metrics and AI-powered analysis.
+Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Run comprehensive roaming tests across access points using client-side tools—all controlled through natural language.
+
 > [!IMPORTANT]
 > **AI Features Require Your Own API Key**: RoamBot needs an LLM provider (OpenAI, Anthropic, OpenRouter, or local Ollama/LM Studio). Basic roaming tests work without AI. See the [AI analysis section](#ai-analysis-roambot) for configuration.
 
@@ -9,15 +10,13 @@ An automated Wi-Fi roaming analyzer with agentic AI capabilities. Test your wire
 
 ## Features
 
-* **🤖 Agentic AI Assistant (RoamBot)** - Natural language interface with autonomous tool usage. Ask questions, run tests, compare networks, and get insights without manual data wrangling. Supports OpenAI, Anthropic, OpenRouter, or local LLMs (Ollama/LM Studio).
-* **Mobility Score** - Easy-to-read score to evaluate your roaming readiness ([learn more](MOBILITY_SCORE.md)).
-* **Multi-Run Analysis** - AI can autonomously fetch and compare multiple test runs, track performance trends, and identify patterns across networks.
-* **Interactive Web UI** - Modern interface with real-time test execution, AI chat, and result management.
-* **Automatic AP Selection** - Intelligently sequences roams based on RSSI, security type, and network configuration.
-* **Phase Timing Breakout** - Measures duration for auth, reassoc, EAP, and 4-way handshake from the client perspective.
-* **Failed Roam Diagnostics** - Auto-saves log snippets for failed roams with detailed error context.
-* **Save/Load Results** - Persist test runs with notes for historical comparison and trend analysis.
-* **REST API** - Programmatic access to all test and analysis functions.
+* **🤖 Agentic AI Assistant (RoamBot)** - Natural language interface for roaming analysis. Ask questions, run tests, compare results, and get insights—AI autonomously uses tools to analyze your data (supports OpenAI, Anthropic, OpenRouter, or local LLMs)
+* **Automated Roaming Tests** - Uses native Linux tools (`iw`, `wpa_cli`) to perform round-robin roam tests across APs in your area with detailed phase timing
+* **Phase Timing Breakout** - Measures auth, reassoc, EAP, and 4-way handshake duration from the client perspective
+* **Mobility Score** - Single metric for roaming readiness based on security, WiFi generation, and capabilities ([learn more](MOBILITY_SCORE.md))
+* **Failed Roam Diagnostics** - Auto-saves log snippets with detailed error context for troubleshooting
+* **Interactive Web UI** - Real-time test execution, result management, and multi-run comparison
+* **REST API** - Programmatic access to all test and analysis functions
 
 ## Quick Start
 
@@ -92,8 +91,6 @@ Most modern Linux distributions have these installed by default.
    - Login with your configured credentials
    - Accept the self-signed certificate warning (or provide your own certs)
 
-That's it! See [QUICKSTART.md](QUICKSTART.md) for your first roaming test.
-
 </details>
 
 ---
@@ -166,10 +163,15 @@ RoamBot is an agentic AI assistant that can run tests, analyze results, compare 
 - "Which APs are overloaded?"
 - "Do I have co-channel interference?"
 
-### REST API
-REST API for programmatic access. Swagger docs at https://localhost:8443/api/docs (handy button in the UI after login).
+---
+
+## REST API
+
+Full REST API documentation available at `https://localhost:8443/api/docs` (Swagger UI - button in the web interface after login).
 
 API calls require `X-API-Key` header with the key from `~/.config/wlan-autoroam/api_key.txt`.
+
+---
 
 ## Documentation
 
