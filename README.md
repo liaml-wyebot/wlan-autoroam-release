@@ -24,8 +24,14 @@ Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Run c
 
 **Automatically download and install for your platform:**
 
+**If you have curl:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
+```
+
+**If you have wget instead:**
+```bash
+wget -qO- https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
 ```
 
 This will:
