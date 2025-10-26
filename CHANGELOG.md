@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2025-10-26
+
+### Added
+- **Fuzzy Matching for run_dir**: Backend safety net recovers from LLM hallucinations
+  - Catches SSID typos with 80% similarity matching (e.g., "WPA3-SAE-Testt" → "WPA3-SAE-Test")
+  - Catches date hallucinations via exact SSID matching (e.g., "2025-02-30" → "2025-10-26")
+  - Returns helpful 404 suggestion: "Did you mean 'X'?"
+  - MCP tools surface suggestions as ValueError instead of generic HTTPError
+  - Confidence scores prevent false positives (0.6 threshold)
+- **Auto-Synced Mobility Scores**: UI now uses `data.run_dir` instead of dropdown value
+  - Mobility score always matches currently displayed run
+  - Fixes desync when LLM loads results via `notify_ui_load_results()`
+- **Complete OpenAPI Documentation**: All MCP-used and user-facing endpoints now documented
+  - `/api/list_runs` - Primary run listing endpoint with filtering
+  - `/api/compare_runs` - Multi-run comparison with mobility scores
+  - `/api/analyze_with_ai` - AI-powered roam analysis
+  - `/api/chat_followup` - Context-aware chat
+  - `/api/chat_followup_agentic` - Tool-calling enabled chat
+  - Marked `/api/list_saved_runs` as deprecated
+- **Bundled LICENSE**: Legal terms now included in binary for stronger legal protection
+
+### Fixed
+- **LICENSE Wording**: Synced with release repo for improved legal clarity
+  - Added "prior" to "written permission"
+  - Added "EXPRESS OR IMPLIED" to warranty disclaimer
+- **Input Validation**: Enhanced MCP tool robustness for local LLMs (Qwen, etc.)
+  - `compare_roam_runs()`: Type-check run_dirs before join() to prevent TypeError
+  - `list_runs()`: Validate limit >= 0 to prevent silent negative value ignore
+  - `save_results()`: Wrap 404 errors with helpful recovery hints
+  - All error messages include actionable guidance (e.g., "Use list_runs() to see available runs")
+  - Discovered via Haiku 4.5 stress testing
+
+### Changed
+- **Simplified Prompt Guidance**: Reduced verbose run_dir warning to single clear rule
+  - "Extract run_dir from list_runs() output - never construct it yourself"
+  - Fuzzy matcher remains invisible backend safety net
+
 ## [1.1.2] - 2025-10-25
 
 ### Added
@@ -65,6 +102,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `_extract_timestamp()` helper for log line timestamp parsing
 - Improved error log sorting via simple string sort (chronological by nature)
 - Updated OpenAPI spec to v1.1.2 with new endpoints documented
+
+## [1.1.1] - 2025-10-25
+
+### Fixed
+- **Dependency Pinning**: Pin `fastmcp` to `2.12.5` to avoid breaking OAuth dependencies introduced in `2.13.0`
+  - Version 2.13+ added OAuth support with hard dependencies on `diskcache` and `py-key-value-aio`
+  - These dependencies are not needed for wlan-autoroam's use case
+  - Prevents future breaking changes from upstream fastmcp updates
+- **Early Sudo Check**: Add root privilege check at top of `start_autoroam_ui.py`
+  - Shows clean error message when run without sudo
+  - Prevents cryptic PyInstaller PKG extraction errors
+- **Installer Binary Naming**: Fix installer script to match GitHub release artifact names
+  - Changed from `wlan-autoroam-linux-{arch}` to `wlan-autoroam-{arch}`
+  - One-line installer now works correctly with GitHub releases
+
+### Changed
+- **README Cleanup**: Remove broken QUICKSTART.md reference and elevate REST API section
+
+## [1.1.0] - 2025-10-25
+
+### Added
+- **UI State Tracking**: New `/api/get_ui_loaded_run` endpoint returns currently loaded run directory
+  - Enables AI to understand which test results user is viewing
+  - MCP tool `get_ui_loaded_run()` queries this endpoint for context-aware responses
+- **Improved Tool Guidance**: Enhanced system prompt with "AVAILABLE TOOLS" section
+  - Documents when to use each MCP tool with workflow examples
+  - Marks deprecated tools (`get_latest_summary`, `get_latest_run_dir`) with preferred alternatives
+  - Guides AI to use `get_ui_loaded_run()` → `get_current_roam_data()` workflow
+
+### Fixed
+- **Mobility Scoring**: Technology scoring now correctly uses `phy_types` field from candidate data
+  - Fixes WiFi 6/6E/7 generation detection
+  - Improves WPA3 Enterprise detection (SHA-256 in auth suite)
+  - UI tooltip now displays actual `security_tier` from scoring instead of hardcoded labels
+
+### Changed
+- **OpenAPI Spec**: Updated to version 1.1.0 with new `/api/get_ui_loaded_run` endpoint documentation
+
 
 ## [1.0.2] - 2025-10-25
 
