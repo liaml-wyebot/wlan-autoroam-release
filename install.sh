@@ -1,13 +1,16 @@
 #!/bin/bash
 #
 # wlan-autoroam installer
-# One-line install: curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
+#
+# One-line install (choose based on what's available):
+#   curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
+#   wget -qO- https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
 #
 # This script:
 # 1. Detects your system architecture (AMD64, ARM64, ARMv7)
 # 2. Downloads the latest release binary for your platform
 # 3. Installs to /usr/local/bin/wlan-autoroam (accessible from anywhere)
-# 4. Makes it executable and sets permissions
+# 4. Makes it executable and sets permissions (755 = world-readable)
 # 5. Shows helpful usage instructions
 
 set -e  # Exit on error
@@ -71,7 +74,13 @@ success "Detected: $ARCH → $PLATFORM"
 
 # Get latest release version
 info "Checking for latest release..."
-LATEST_RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+if command -v curl &> /dev/null; then
+    LATEST_RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+elif command -v wget &> /dev/null; then
+    LATEST_RELEASE=$(wget -qO- "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+else
+    error "Neither curl nor wget found. Please install one of them and try again."
+fi
 if [ -z "$LATEST_RELEASE" ]; then
     error "Failed to fetch latest release version"
 fi
@@ -93,12 +102,22 @@ fi
 # Download URL
 DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
 
-# Download binary
+# Download binary (try curl first, fallback to wget)
 info "Downloading wlan-autoroam-$PLATFORM..."
 TMP_FILE=$(mktemp)
-if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE"; then
+if command -v curl &> /dev/null; then
+    if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE"; then
+        rm -f "$TMP_FILE"
+        error "Failed to download binary from $DOWNLOAD_URL"
+    fi
+elif command -v wget &> /dev/null; then
+    if ! wget -qO "$TMP_FILE" "$DOWNLOAD_URL"; then
+        rm -f "$TMP_FILE"
+        error "Failed to download binary from $DOWNLOAD_URL"
+    fi
+else
     rm -f "$TMP_FILE"
-    error "Failed to download binary from $DOWNLOAD_URL"
+    error "Neither curl nor wget found. Please install one of them and try again."
 fi
 success "Downloaded successfully"
 
@@ -111,7 +130,7 @@ fi
 # Install binary
 info "Installing to $INSTALL_DIR/$BINARY_NAME..."
 mv "$TMP_FILE" "$INSTALL_DIR/$BINARY_NAME"
-chmod +x "$INSTALL_DIR/$BINARY_NAME"
+chmod 755 "$INSTALL_DIR/$BINARY_NAME"  # Make readable/executable by all users
 success "Installed to $INSTALL_DIR/$BINARY_NAME"
 
 # Verify installation
@@ -133,7 +152,7 @@ echo -e "  Platform: ${BLUE}$PLATFORM${NC}"
 echo -e "  Location: ${BLUE}$INSTALL_DIR/$BINARY_NAME${NC}"
 echo ""
 echo -e "${YELLOW}Quick Start:${NC}"
-echo -e "  ${GREEN}sudo wlan-autoroam${NC}               # Start the UI"
+echo -e "  ${GREEN}sudo wlan-autoroam${NC}               # Start the UI (web browser will open)"
 echo -e "  ${GREEN}sudo wlan-autoroam --help${NC}        # Show help options"
 echo ""
 echo -e "${YELLOW}Access the UI:${NC}"
@@ -141,7 +160,8 @@ echo -e "  Open your browser to: ${BLUE}https://localhost:8443${NC}"
 echo -e "  Default credentials: ${BLUE}admin / admin${NC} (change after first login)"
 echo ""
 echo -e "${YELLOW}Update to latest version:${NC}"
-echo -e "  Run this installer again: ${GREEN}curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash${NC}"
+echo -e "  ${GREEN}curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash${NC}"
+echo -e "  ${GREEN}wget -qO- https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash${NC}"
 echo ""
 echo -e "${YELLOW}Uninstall:${NC}"
 echo -e "  ${GREEN}sudo rm $INSTALL_DIR/$BINARY_NAME${NC}"
