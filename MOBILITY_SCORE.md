@@ -157,11 +157,11 @@ Evaluates WiFi generation adoption and legacy protocol usage.
 - WiFi 4: Aging but functional
 - Mixed deployments receive proportional scores
 
-**Security Protocol Tier**
+**Security Generation Tier**
 - WPA3: Modern encryption and authentication
 - WPA2: Industry standard
 - WPA1: Deprecated, security risk
-- Open: Unacceptable for most deployments
+- Open: No encryption at all - still commonly used today but it won't earn any points
 
 **Legacy Rate Detection**
 - 802.11b rates (1/2 Mbps) consume excessive airtime
@@ -181,13 +181,13 @@ Authentication method strength evaluation based on best-in-class industry standa
 - Centralized credential management
 
 **Personal (PSK/SAE)**
-- WPA3-Personal (SAE): Modern, secure
+- WPA3-Personal (SAE): Modern, less vulnerabilities than WPA2.
 - WPA2-Personal (PSK): Acceptable for small deployments
 - Shared password model has inherent limitations
 
 **Guest/Open**
 - OWE (Enhanced Open): Encrypted but no authentication
-- Open: Not recommended for any production use
+- Open: No encryption - no points!
 
 Scoring reflects the security level while acknowledging that different deployment types have different requirements.
 
@@ -291,7 +291,7 @@ Problem: Perfect config (90) + broken roaming (0) = 90/100 (A-)
 Our approach:
 ```
 performance_multiplier × config_score = total
-Result: Perfect config × 0% performance = 0/100 (F)
+Result: Perfect config × 0% performance = 0/100
 ```
 
 ### Piecewise Linear Interpolation
@@ -362,10 +362,10 @@ Scoring adapts to available data:
 
 | Deployment Type | Target Score | Rationale |
 |----------------|--------------|-----------|
-| Enterprise Production | 90+ (A-range) | Mission-critical WiFi requires excellence |
-| SMB Production | 80+ (B-range) | Acceptable for business use |
-| Home/Small Office | 70+ (C-range) | Functional roaming capability |
-| Development/Lab | 60+ (D-range) | Testing environment |
+| Enterprise Production | 90+ | Mission-critical WiFi requires excellence |
+| SMB Production | 80+ | Acceptable for business use |
+| Home/Small Office | 70+ | Functional roaming capability |
+| Development/Lab | 60+ | Testing environment |
 
 ---
 
