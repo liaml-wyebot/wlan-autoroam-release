@@ -5,7 +5,8 @@ Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Run c
 > [!IMPORTANT]
 > **AI Features Require Your Own API Key**: RoamBot needs an LLM provider (OpenAI, Anthropic, OpenRouter, or local Ollama/LM Studio). Basic roaming tests work without AI. See the [AI analysis section](#ai-analysis-roambot) for configuration.
 
-<img width="1234" height="1338" alt="10 0 10 58_8443_ (5)" src="https://github.com/user-attachments/assets/78c8f4f5-2b20-4a74-b32b-b5a6e9f3356e" />
+<img width="1249" height="1342" alt="localhost_8443_ (2)-crop" src="https://github.com/user-attachments/assets/2a416268-d989-4c9e-85f6-e2291d7630a7" />
+
 
 
 ## Features
@@ -211,6 +212,9 @@ Always run wlan-autoroam with `sudo` as it requires root privileges to access wi
 ## License
 
 Free to use. See [LICENSE](LICENSE) for details.
+
+## Full UI Screenshot
+<img width="1350" height="2052" alt="localhost_8443_ (2)" src="https://github.com/user-attachments/assets/22e9ed7d-0a43-4e0e-8fe9-5f976f9be5ee" />
 
 ---
 
