@@ -199,7 +199,7 @@ Final scores are converted to letter grades for intuitive understanding:
 
 | Grade | Score Range | Interpretation |
 |-------|-------------|----------------|
-| Excellent | 91-100 | Excellent - Production-ready enterprise WiFi |
+| Excellent | 86-100 | Excellent - Production-ready enterprise WiFi |
 | Good | 71-85 | Good - Solid network with optimization opportunities |
 | Fair | 51-70 | Fair - Functional with notable issues |
 | Poor | 21-50 | Poor - Significant problems requiring remediation |
