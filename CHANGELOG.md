@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.4] - 2025-10-26
+
+### Added
+- **LLM Context Awareness**: AI assistant now always knows which run is displayed in UI
+  - Injected via user message: `[Currently viewing: run_name]`
+  - Eliminates "this result" ambiguity in follow-up questions
+  - No HTTP calls - uses Flask global `_current_ui_loaded_run` directly
+  - Cache-friendly design: system message stays constant, UI context in user message
+- **OpenAI Prompt Caching**: Optimized for cost savings with automatic caching
+  - System message always cached after first call (≥1024 tokens)
+  - Conversation history fully cacheable (prefix-matching)
+  - Achieved 91-96% cache hit rates on follow-up questions in testing
+  - 50% cost reduction on cached tokens
+- **SSL Error Suppression**: Clean terminal logs with harmless browser disconnect errors filtered
+  - Suppresses ssl.SSLError, BrokenPipeError, ConnectionResetError
+  - Applied to werkzeug and root loggers via custom filter
+
+### Changed
+- **MCP Tool Consolidation**: Reduced from 13 tools → 8 tools via unification
+  - **Removed**: `list_saved_runs()` → use `list_runs(saved_only=True)`
+  - **Removed**: `list_runs_by_ssid()` → use `list_runs(ssid="...")`
+  - **Removed**: `get_latest_summary()` → use `list_runs()[0]` + `get_current_roam_data()`
+  - **Removed**: `notify_ui_load_results()` → automatic side effect in `get_current_roam_data()`
+  - **Removed**: `analyze_with_ai()` → legacy tool, LLM orchestration moved to client
+  - All functionality preserved, simpler API surface, less cognitive load for LLMs
+- **Mobility Score Redesign**: 5-tier system using full 0-100 range (not academic grading)
+  - **86-100**: Excellent (●●●●●) - Purple
+  - **71-85**: Good (●●●●○) - Green
+  - **51-70**: Fair (●●●○○) - Gray
+  - **21-50**: Poor (●●○○○) - Yellow
+  - **0-20**: Awful (●○○○○) - Red
+  - Previous academic grading (90/80/70/60 breakpoints) was misleading
+  - 59% showed as "F" but represents Fair performance
+  - New breakpoints better reflect actual network quality
+- **Tier Indicators**: Switched from ASCII bars to Unicode dots
+  - Filled dots (●) in tier color, unfilled dots (○) dimmed to 25% opacity
+  - All same size for perfect alignment (previous bars/squares had sizing issues)
+  - Clean, minimal visual design
+- **Architecture Refactor**: Centralized streaming logic in `mcp_client.py`
+  - Eliminated 250+ lines of duplicate code from `app.py`
+  - New `chat_stream()` generator handles SSE streaming with tool execution
+  - `/api/chat_stream` endpoint simplified to ~100 lines (was ~350)
+  - Clean separation: app.py = HTTP transport, mcp_client = orchestration
+
+### Fixed
+- **Cache Performance Tracking**: Suppress misleading cache logs for OpenRouter
+  - OpenRouter doesn't expose cache stats in API (though caching works)
+  - Grok has 90% cache discount but stats not visible
+  - Validated cache functionality with OpenAI (confirmed 91-96% hit rates)
+
 ## [1.1.3] - 2025-10-26
 
 ### Added
