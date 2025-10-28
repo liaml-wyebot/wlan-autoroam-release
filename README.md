@@ -223,12 +223,16 @@ The web interface will be available at https://localhost:8443 (or your chosen po
 **Security Note:**
 Always run wlan-autoroam with `sudo` as it requires root privileges to access wireless utilities (`iw`, `wpa_cli`). Config files are created with secure permissions (600/644).
 
-## License
-
-Free to use. See [LICENSE](LICENSE) for details.
+---
 
 ## Full UI Screenshot
 <img width="1350" height="2052" alt="localhost_8443_ (2)" src="https://github.com/user-attachments/assets/22e9ed7d-0a43-4e0e-8fe9-5f976f9be5ee" />
+
+---
+
+## License
+
+Free to use. See [LICENSE](LICENSE) for details.
 
 ---
 
