@@ -129,27 +129,54 @@ After setup, your configuration lives in:
 
 ## AI Analysis (RoamBot)
 
-RoamBot is an agentic AI assistant that can run tests, analyze results, compare networks, and answer questions about your Wi-Fi infrastructure. It uses the Model Context Protocol (MCP) to access tools and data autonomously.
+RoamBot is an **agentic AI assistant** that autonomously analyzes your roaming tests. Unlike chatbots that just answer questions, RoamBot takes action: it runs tests, fetches data, compares results, and provides insights—all from natural language requests.
 
-**What makes it "agentic"?** RoamBot decides which actions to take based on your question. Ask to "run a test and compare it to yesterday's run" - it'll start the test, wait for completion, fetch the historical data, and provide a comparison. No button clicking required.
+**Example:**
+> "Run a test and compare it to yesterday's results"
 
-> [!TIP]
-> In my testing Claude Haiku 4.5 (Anthropic) has been best for price/performance. The MCP implementation makes is easy to swap out models so experiment to find what works best for you. To easily try different public models, check out OpenRouter. Local LLMs via Ollama like Qwen3 do work but YMMV.
+RoamBot will:
+1. Start a new roam test
+2. Wait for completion
+3. Fetch yesterday's test data
+4. Compare performance metrics
+5. Explain the differences
+
+No clicking buttons or navigating the dashboard needed.
 
 ### Setup
 
-1. Click **AI Settings** (top bar icon) and configure your provider:
-   - **OpenAI**: Get API key from https://platform.openai.com/api-keys. Endpoint: `https://api.openai.com/v1`.
-   - **Anthropic**: Get API key from https://console.anthropic.com/. Endpoint: `https://api.anthropic.com/v1`.
-   - **OpenRouter** (multi-model): Get API key from https://openrouter.ai/. Endpoint: `https://openrouter.ai/api/v1`. Supports Claude, GPT-4, Gemini, and 200+ models.
-   - **Ollama** (local): Install with `curl -fsSL https://ollama.ai/install.sh | sh`, pull a model (`ollama pull llama3.2`), set endpoint to `http://localhost:11434/v1`.
-   - **LM Studio** (local): Download from https://lmstudio.ai/, start the server, set endpoint to `http://localhost:1234/v1`.
+**You need an LLM provider** (your API key, your usage):
+- **OpenAI** ([get key](https://platform.openai.com/api-keys)) - GPT
+- **Anthropic** ([get key](https://console.anthropic.com/)) - Claude 
+- **OpenRouter** ([get key](https://openrouter.ai/)) - 200+ models from one API
+- **Ollama** (local/free) - `curl -fsSL https://ollama.ai/install.sh | sh`
 
-2. Save settings and start chatting. RoamBot will introduce itself.
+Configure via **AI Settings** button in the web UI. Basic roaming tests work without AI.
 
-**Token usage:** The AI panel header shows token consumption. Agentic mode can pull significant data when comparing runs - watch your usage carefully. You generally get what you pay for, but I've tried to make the prompt engineering explicit enough to make "dumb" models "smart". For free usage, go local with Ollama - bring a big GPU.
+> **Recommendation:** Claude 4.5 Haiku via Anthropic has the best price to performance ratio in my testing. I've also been impressed with Grok Code Fast 1 via OpenRouter. Experiment to find what works best for you!
 
-**Privacy:** Your credentials and test data are only sent when you request analysis. Use local providers (Ollama/LM Studio) for complete privacy.
+<details>
+<summary><b>Example Questions</b></summary>
+
+**Running tests:**
+- "Run a roam test on wlp0s20f3"
+- "Test with RSSI threshold of -70 and save results"
+
+**Analysis:**
+- "What failed in this test?"
+- "Why did roam #3 take 400ms?"
+- "Are there configuration issues with these APs?"
+
+**Multi-run comparison:**
+- "Compare the last two Wilson-Corp runs"
+- "Has performance improved since last week?"
+- "Which network has better roaming?"
+
+**Network audit:**
+- "Are all APs configured consistently?"
+- "Do I have co-channel interference?"
+
+</details>
 
 
 > [!NOTE]
