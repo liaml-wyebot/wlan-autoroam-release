@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.6] - 2025-10-28
+
+### Security
+- **CRITICAL**: Fixed LLM API key exposure in server startup logs
+  - API key is now masked as `***` in console output
+  - Previously, the full API key was printed to stdout when loading AI configuration
+
 ## [1.1.5] - 2025-10-27
 
 ### Added
