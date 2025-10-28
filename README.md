@@ -1,7 +1,6 @@
 # wlan-autoroam
 
-Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Run comprehensive roaming tests across access points using client-side tools—all controlled through natural language.
-
+Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Validate mobility performance, visualize results, or just hang out with RoamBot. 
 > [!IMPORTANT]
 > **AI Features Require Your Own API Key**: RoamBot needs an LLM provider (OpenAI, Anthropic, OpenRouter, or local Ollama/LM Studio). Basic roaming tests work without AI. See the [AI analysis section](#ai-analysis-roambot) for configuration.
 
@@ -141,7 +140,6 @@ RoamBot is an agentic AI assistant that can run tests, analyze results, compare 
 
 **Privacy:** Your credentials and test data are only sent when you request analysis. Use local providers (Ollama/LM Studio) for complete privacy.
 
-**Customization:** Edit AI behavior in `autoroam/tools/prompt_engineering.py`.
 
 > [!NOTE]
 > AI settings (API key, endpoint, model) are stored locally in `webui/server/ai_settings.json`. Your preferred interface is saved in `webui/server/user_prefs.json` - tell RoamBot once and it remembers.
