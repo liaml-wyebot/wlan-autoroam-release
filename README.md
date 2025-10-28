@@ -18,6 +18,17 @@ Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Valid
 * **Interactive Web UI** - Real-time test execution, result management, and multi-run comparison
 * **REST API** - Programmatic access to all test and analysis functions
 
+## Supported Hardware
+This was built to run on Linux systems, primarily tested on Debian based distros (Debian, Raspberry Pi OS, Ubuntu, Kali, etc). Core utilities needed are `iw`, `wpa_cli`, and `journalctl`.
+
+You need a Wi-Fi radio with an active connection to an SSID. Most testing has been done on Intel radios (common in laptops) and Broadcom radios (built into Raspberry Pi).
+> [!NOTE]
+> Other radios should work, but have not been tested. Messages in the user-space logging (wpa_supplicant) vary slightly between vendors, and can cause problems with log parsing. If you find a quirk with a radio I haven't tested, open an [issue](https://github.com/jwil007/wlan-autoroam-release/issues) with details.
+
+Binaries are built for `AMD64`, `ARM64`, and `ARMv7` architectures. The one-line install linked below will automatically select the right one for your system.
+
+
+
 ## Quick Start
 
 ### 🚀 One-Line Install (Recommended)
