@@ -60,7 +60,7 @@ You need a Wi-Fi radio with an active connection to an SSID. Most testing has be
 > [!NOTE]
 > Other radios should work, but have not been tested. Messages in the user-space logging (wpa_supplicant) vary slightly between vendors, and can cause problems with log parsing. If you find a quirk with a radio I haven't tested, open an [issue](https://github.com/jwil007/wlan-autoroam-release/issues) with details.
 
-Binaries are built for `AMD64`, `ARM64`, and `ARMv7` architectures. The one-line install linked below will automatically select the right one for your system.
+Binaries are built for `AMD64`, `ARM64`, and `ARMv7` architectures. The one-line install linked above will automatically select the right one for your system.
 
 ### 📦 Manual Installation
 
