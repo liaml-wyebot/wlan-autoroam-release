@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.5] - 2025-10-27
+
+### Added
+- Environment-based API key support via `AUTOROAM_API_KEY` environment variable
+- Enables standalone MCP server deployment without Flask backend
+
+### Fixed
+- Channel overlap detection in mobility score calculations (field name mismatch)
+- Mobility score dot rendering inconsistency on Windows
+
+### Changed
+- Removed 6 deprecated API endpoints (replaced by `/api/chat_stream`)
+- Updated OpenAPI documentation to reflect active endpoints only
+
 ## [1.1.4] - 2025-10-26
 
 ### Added
