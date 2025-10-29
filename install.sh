@@ -144,9 +144,9 @@ if [ -n "$AUTH_HEADER" ]; then
     
     # Get release info and extract asset ID using Python (more reliable than grep/sed)
     if command -v curl &> /dev/null; then
-        ASSET_ID=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" | python3 -c "import sys, json; assets = json.load(sys.stdin).get('assets', []); print(next((a['id'] for a in assets if a['name'] == '$ASSET_NAME'), ''))")
+        ASSET_ID=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" | python3 -c "import sys, json; assets = json.load(sys.stdin).get('assets', []); print(next((str(a['id']) for a in assets if a['name'] == sys.argv[1]), ''))" "$ASSET_NAME")
     elif command -v wget &> /dev/null; then
-        ASSET_ID=$(wget --header="$AUTH_HEADER" -qO- "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" | python3 -c "import sys, json; assets = json.load(sys.stdin).get('assets', []); print(next((a['id'] for a in assets if a['name'] == '$ASSET_NAME'), ''))")
+        ASSET_ID=$(wget --header="$AUTH_HEADER" -qO- "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" | python3 -c "import sys, json; assets = json.load(sys.stdin).get('assets', []); print(next((str(a['id']) for a in assets if a['name'] == sys.argv[1]), ''))" "$ASSET_NAME")
     fi
     
     if [ -z "$ASSET_ID" ]; then
