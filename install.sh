@@ -145,15 +145,11 @@ if [ -n "$AUTH_HEADER" ]; then
     if command -v curl &> /dev/null; then
         ASSET_URL=$(curl -s -H "$AUTH_HEADER" \
             "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" \
-            | grep -A 3 "\"name\": \"$ASSET_NAME\"" \
-            | grep "browser_download_url" \
-            | cut -d'"' -f4)
+            | grep -o "https://github.com/$REPO/releases/download/$LATEST_RELEASE/$ASSET_NAME")
     elif command -v wget &> /dev/null; then
         ASSET_URL=$(wget --header="$AUTH_HEADER" -qO- \
             "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" \
-            | grep -A 3 "\"name\": \"$ASSET_NAME\"" \
-            | grep "browser_download_url" \
-            | cut -d'"' -f4)
+            | grep -o "https://github.com/$REPO/releases/download/$LATEST_RELEASE/$ASSET_NAME")
     fi
     
     if [ -z "$ASSET_URL" ]; then
