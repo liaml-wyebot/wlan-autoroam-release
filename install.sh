@@ -136,31 +136,8 @@ if [ -f "$INSTALL_DIR/$BINARY_NAME" ]; then
     fi
 fi
 
-# Download URL
-if [ -n "$AUTH_HEADER" ]; then
-    # For private repos, use GitHub API to get asset download URL
-    info "Fetching download URL from GitHub API..."
-    ASSET_NAME="wlan-autoroam-$PLATFORM"
-    
-    if command -v curl &> /dev/null; then
-        ASSET_URL=$(curl -s -H "$AUTH_HEADER" \
-            "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" \
-            | grep -o "https://github.com/$REPO/releases/download/$LATEST_RELEASE/$ASSET_NAME")
-    elif command -v wget &> /dev/null; then
-        ASSET_URL=$(wget --header="$AUTH_HEADER" -qO- \
-            "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" \
-            | grep -o "https://github.com/$REPO/releases/download/$LATEST_RELEASE/$ASSET_NAME")
-    fi
-    
-    if [ -z "$ASSET_URL" ]; then
-        error "Failed to find asset $ASSET_NAME in release $LATEST_RELEASE"
-    fi
-    
-    DOWNLOAD_URL="$ASSET_URL"
-else
-    # For public repos, use direct download URL
-    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
-fi
+# Download URL (works for both public and private repos)
+DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
 
 
 # Download binary (try curl first, fallback to wget)
@@ -170,7 +147,7 @@ DOWNLOAD_SUCCESS=0
 
 if command -v curl &> /dev/null; then
     if [ -n "$AUTH_HEADER" ]; then
-        if curl -fsSL -H "$AUTH_HEADER" "$DOWNLOAD_URL" -o "$TMP_FILE"; then
+        if curl -fsSL -H "$AUTH_HEADER" -H "Accept: application/octet-stream" "$DOWNLOAD_URL" -o "$TMP_FILE"; then
             DOWNLOAD_SUCCESS=1
         fi
     else
@@ -180,7 +157,7 @@ if command -v curl &> /dev/null; then
     fi
 elif command -v wget &> /dev/null; then
     if [ -n "$AUTH_HEADER" ]; then
-        if wget --header="$AUTH_HEADER" -qO "$TMP_FILE" "$DOWNLOAD_URL"; then
+        if wget --header="$AUTH_HEADER" --header="Accept: application/octet-stream" -qO "$TMP_FILE" "$DOWNLOAD_URL"; then
             DOWNLOAD_SUCCESS=1
         fi
     else
