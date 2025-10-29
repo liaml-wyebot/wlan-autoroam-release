@@ -60,7 +60,7 @@ Replace `ghp_your_token_here` with your actual token.
 curl -H "Authorization: token $GITHUB_TOKEN" \
   -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
   -o /tmp/install-wlan.sh && \
-sudo bash /tmp/install-wlan.sh && \
+sudo GITHUB_TOKEN="$GITHUB_TOKEN" bash /tmp/install-wlan.sh && \
 rm /tmp/install-wlan.sh
 ```
 
@@ -72,7 +72,7 @@ The `-E` flag preserves your environment variables (including `GITHUB_TOKEN`).
 curl -H "Authorization: token ghp_your_token_here" \
   -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
   -o /tmp/install-wlan.sh && \
-sudo bash /tmp/install-wlan.sh && \
+sudo GITHUB_TOKEN="$GITHUB_TOKEN" bash /tmp/install-wlan.sh && \
 rm /tmp/install-wlan.sh
 ```
 
@@ -159,14 +159,14 @@ To update to the latest release:
 curl -H "Authorization: token $GITHUB_TOKEN" \
   -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
   -o /tmp/install-wlan.sh && \
-sudo bash /tmp/install-wlan.sh && \
+sudo GITHUB_TOKEN="$GITHUB_TOKEN" bash /tmp/install-wlan.sh && \
 rm /tmp/install-wlan.sh
 
 # Or with inline token
 curl -H "Authorization: token ghp_your_token_here" \
   -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
   -o /tmp/install-wlan.sh && \
-sudo bash /tmp/install-wlan.sh && \
+sudo GITHUB_TOKEN="ghp_your_token_here" bash /tmp/install-wlan.sh && \
 rm /tmp/install-wlan.sh
 ```
 
@@ -214,7 +214,7 @@ If you encounter issues not covered in this guide:
 curl -H "Authorization: token $GITHUB_TOKEN" \
   -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
   -o /tmp/install-wlan.sh && \
-sudo bash /tmp/install-wlan.sh && \
+sudo GITHUB_TOKEN="$GITHUB_TOKEN" bash /tmp/install-wlan.sh && \
 rm /tmp/install-wlan.sh
 
 # Run
@@ -224,7 +224,7 @@ sudo wlan-autoroam
 curl -H "Authorization: token $GITHUB_TOKEN" \
   -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
   -o /tmp/install-wlan.sh && \
-sudo bash /tmp/install-wlan.sh && \
+sudo GITHUB_TOKEN="$GITHUB_TOKEN" bash /tmp/install-wlan.sh && \
 rm /tmp/install-wlan.sh
 
 # Uninstall
