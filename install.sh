@@ -31,12 +31,6 @@ REPO="${GITHUB_REPO:-jwil007/wlan-autoroam-release}"
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="wlan-autoroam"
 
-# Authentication header (for private repos)
-AUTH_HEADER=""
-if [ -n "$GITHUB_TOKEN" ]; then
-    AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
-    info "Using GitHub authentication token"
-fi
 
 # Helper functions
 info() {
@@ -55,6 +49,13 @@ error() {
     echo -e "${RED}✗${NC} $1"
     exit 1
 }
+
+# Authentication header (for private repos)
+AUTH_HEADER=""
+if [ -n "$GITHUB_TOKEN" ]; then
+    AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
+    info "Using GitHub authentication token"
+fi
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then 
