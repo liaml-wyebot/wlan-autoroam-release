@@ -57,7 +57,7 @@ Replace `ghp_your_token_here` with your actual token.
 ### Option A: Using saved token (if you completed Step 2.2)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
+curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
 ```
 
 The `-E` flag preserves your environment variables (including `GITHUB_TOKEN`).
@@ -65,7 +65,7 @@ The `-E` flag preserves your environment variables (including `GITHUB_TOKEN`).
 ### Option B: Inline token (one-time install)
 
 ```bash
-GITHUB_TOKEN=ghp_your_token_here curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
+GITHUB_TOKEN=ghp_your_token_here curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
 ```
 
 Replace `ghp_your_token_here` with your actual token.
@@ -148,10 +148,10 @@ To update to the latest release:
 
 ```bash
 # If token is saved in your profile
-curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
+curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
 
 # Or with inline token
-GITHUB_TOKEN=ghp_your_token_here curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
+GITHUB_TOKEN=ghp_your_token_here curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
 ```
 
 The installer automatically detects if you have an older version and upgrades it.
@@ -195,13 +195,13 @@ If you encounter issues not covered in this guide:
 
 ```bash
 # Install (with saved token)
-curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
+curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
 
 # Run
 sudo wlan-autoroam
 
 # Update
-curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
+curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
 
 # Uninstall
 sudo rm /usr/local/bin/wlan-autoroam
