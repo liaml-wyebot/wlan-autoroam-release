@@ -137,7 +137,35 @@ if [ -f "$INSTALL_DIR/$BINARY_NAME" ]; then
 fi
 
 # Download URL
-DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
+if [ -n "$AUTH_HEADER" ]; then
+    # For private repos, use GitHub API to get asset download URL
+    info "Fetching download URL from GitHub API..."
+    ASSET_NAME="wlan-autoroam-$PLATFORM"
+    
+    if command -v curl &> /dev/null; then
+        ASSET_URL=$(curl -s -H "$AUTH_HEADER" \
+            "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" \
+            | grep -A 3 "\"name\": \"$ASSET_NAME\"" \
+            | grep "browser_download_url" \
+            | cut -d'"' -f4)
+    elif command -v wget &> /dev/null; then
+        ASSET_URL=$(wget --header="$AUTH_HEADER" -qO- \
+            "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" \
+            | grep -A 3 "\"name\": \"$ASSET_NAME\"" \
+            | grep "browser_download_url" \
+            | cut -d'"' -f4)
+    fi
+    
+    if [ -z "$ASSET_URL" ]; then
+        error "Failed to find asset $ASSET_NAME in release $LATEST_RELEASE"
+    fi
+    
+    DOWNLOAD_URL="$ASSET_URL"
+else
+    # For public repos, use direct download URL
+    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
+fi
+
 
 # Download binary (try curl first, fallback to wget)
 info "Downloading wlan-autoroam-$PLATFORM..."
