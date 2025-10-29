@@ -144,11 +144,9 @@ if [ -n "$AUTH_HEADER" ]; then
     
     # Get release info and extract asset ID
     if command -v curl &> /dev/null; then
-        RELEASE_DATA=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE")
-        ASSET_ID=$(echo "$RELEASE_DATA" | grep -B 2 "\"name\": \"$ASSET_NAME\"" | grep '"id"' | grep -o '[0-9]*' | head -1)
+        ASSET_ID=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" | sed -n '/"id":/h; /"name": "'"$ASSET_NAME"'"/{ g; s/.*"id": \([0-9]*\).*/\1/p; q }')
     elif command -v wget &> /dev/null; then
-        RELEASE_DATA=$(wget --header="$AUTH_HEADER" -qO- "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE")
-        ASSET_ID=$(echo "$RELEASE_DATA" | grep -B 2 "\"name\": \"$ASSET_NAME\"" | grep '"id"' | grep -o '[0-9]*' | head -1)
+        ASSET_ID=$(wget --header="$AUTH_HEADER" -qO- "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE" | sed -n '/"id":/h; /"name": "'"$ASSET_NAME"'"/{ g; s/.*"id": \([0-9]*\).*/\1/p; q }')
     fi
     
     if [ -z "$ASSET_ID" ]; then
