@@ -2,9 +2,12 @@
 #
 # wlan-autoroam installer
 #
-# One-line install (choose based on what's available):
-#   curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
-#   wget -qO- https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash
+# PUBLIC REPO INSTALL:
+#   curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo bash
+#   wget -qO- https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo bash
+#
+# PRIVATE REPO INSTALL (requires GitHub Personal Access Token):
+#   GITHUB_TOKEN=ghp_xxxx curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/scripts/install.sh | sudo -E bash
 #
 # This script:
 # 1. Detects your system architecture (AMD64, ARM64, ARMv7)
@@ -12,6 +15,7 @@
 # 3. Installs to /usr/local/bin/wlan-autoroam (accessible from anywhere)
 # 4. Makes it executable and sets permissions (755 = world-readable)
 # 5. Shows helpful usage instructions
+# 6. Supports both public and private GitHub repositories
 
 set -e  # Exit on error
 
@@ -23,9 +27,16 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # GitHub release info
-REPO="jwil007/wlan-autoroam-release"
+REPO="${GITHUB_REPO:-jwil007/wlan-autoroam-release}"
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="wlan-autoroam"
+
+# Authentication header (for private repos)
+AUTH_HEADER=""
+if [ -n "$GITHUB_TOKEN" ]; then
+    AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
+    info "Using GitHub authentication token"
+fi
 
 # Helper functions
 info() {
@@ -75,14 +86,39 @@ success "Detected: $ARCH → $PLATFORM"
 # Get latest release version
 info "Checking for latest release..."
 if command -v curl &> /dev/null; then
-    LATEST_RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if [ -n "$AUTH_HEADER" ]; then
+        LATEST_RELEASE=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    else
+        LATEST_RELEASE=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    fi
 elif command -v wget &> /dev/null; then
-    LATEST_RELEASE=$(wget -qO- "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    if [ -n "$AUTH_HEADER" ]; then
+        LATEST_RELEASE=$(wget --header="$AUTH_HEADER" -qO- "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    else
+        LATEST_RELEASE=$(wget -qO- "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    fi
 else
     error "Neither curl nor wget found. Please install one of them and try again."
 fi
+
 if [ -z "$LATEST_RELEASE" ]; then
+    echo ""
     error "Failed to fetch latest release version"
+    echo ""
+    if [ -z "$GITHUB_TOKEN" ]; then
+        echo -e "${YELLOW}💡 This might be a private repository.${NC}"
+        echo -e "   If so, you need to set GITHUB_TOKEN environment variable."
+        echo ""
+        echo -e "   See: ${BLUE}https://github.com/$REPO/blob/main/INTERNAL_INSTALL.md${NC}"
+        echo ""
+    else
+        echo -e "${YELLOW}💡 Possible issues:${NC}"
+        echo -e "   1. Invalid GitHub token"
+        echo -e "   2. Token doesn't have 'repo' scope"
+        echo -e "   3. You don't have access to this repository"
+        echo ""
+    fi
+    exit 1
 fi
 success "Latest version: $LATEST_RELEASE"
 
@@ -105,19 +141,44 @@ DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-au
 # Download binary (try curl first, fallback to wget)
 info "Downloading wlan-autoroam-$PLATFORM..."
 TMP_FILE=$(mktemp)
+DOWNLOAD_SUCCESS=0
+
 if command -v curl &> /dev/null; then
-    if ! curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE"; then
-        rm -f "$TMP_FILE"
-        error "Failed to download binary from $DOWNLOAD_URL"
+    if [ -n "$AUTH_HEADER" ]; then
+        if curl -fsSL -H "$AUTH_HEADER" "$DOWNLOAD_URL" -o "$TMP_FILE"; then
+            DOWNLOAD_SUCCESS=1
+        fi
+    else
+        if curl -fsSL "$DOWNLOAD_URL" -o "$TMP_FILE"; then
+            DOWNLOAD_SUCCESS=1
+        fi
     fi
 elif command -v wget &> /dev/null; then
-    if ! wget -qO "$TMP_FILE" "$DOWNLOAD_URL"; then
-        rm -f "$TMP_FILE"
-        error "Failed to download binary from $DOWNLOAD_URL"
+    if [ -n "$AUTH_HEADER" ]; then
+        if wget --header="$AUTH_HEADER" -qO "$TMP_FILE" "$DOWNLOAD_URL"; then
+            DOWNLOAD_SUCCESS=1
+        fi
+    else
+        if wget -qO "$TMP_FILE" "$DOWNLOAD_URL"; then
+            DOWNLOAD_SUCCESS=1
+        fi
     fi
 else
     rm -f "$TMP_FILE"
     error "Neither curl nor wget found. Please install one of them and try again."
+fi
+
+if [ $DOWNLOAD_SUCCESS -eq 0 ]; then
+    rm -f "$TMP_FILE"
+    echo ""
+    error "Failed to download binary from $DOWNLOAD_URL"
+    echo ""
+    if [ -z "$GITHUB_TOKEN" ]; then
+        echo -e "${YELLOW}💡 This might be a private repository requiring authentication.${NC}"
+        echo -e "   See: ${BLUE}https://github.com/$REPO/blob/main/INTERNAL_INSTALL.md${NC}"
+        echo ""
+    fi
+    exit 1
 fi
 success "Downloaded successfully"
 
@@ -160,8 +221,11 @@ echo -e "  Open your browser to: ${BLUE}https://localhost:8443${NC}"
 echo -e "  Default credentials: ${BLUE}admin / admin${NC} (change after first login)"
 echo ""
 echo -e "${YELLOW}Update to latest version:${NC}"
-echo -e "  ${GREEN}curl -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash${NC}"
-echo -e "  ${GREEN}wget -qO- https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo bash${NC}"
+if [ -n "$GITHUB_TOKEN" ]; then
+    echo -e "  ${GREEN}GITHUB_TOKEN=\$GITHUB_TOKEN curl -fsSL https://raw.githubusercontent.com/$REPO/main/scripts/install.sh | sudo -E bash${NC}"
+else
+    echo -e "  ${GREEN}curl -fsSL https://raw.githubusercontent.com/$REPO/main/scripts/install.sh | sudo bash${NC}"
+fi
 echo ""
 echo -e "${YELLOW}Uninstall:${NC}"
 echo -e "  ${GREEN}sudo rm $INSTALL_DIR/$BINARY_NAME${NC}"
