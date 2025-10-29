@@ -57,7 +57,11 @@ Replace `ghp_your_token_here` with your actual token.
 ### Option A: Using saved token (if you completed Step 2.2)
 
 ```bash
-curl -H "Authorization: token $GITHUB_TOKEN" -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
+  -o /tmp/install-wlan.sh && \
+sudo bash /tmp/install-wlan.sh && \
+rm /tmp/install-wlan.sh
 ```
 
 The `-E` flag preserves your environment variables (including `GITHUB_TOKEN`).
@@ -65,7 +69,11 @@ The `-E` flag preserves your environment variables (including `GITHUB_TOKEN`).
 ### Option B: Inline token (one-time install)
 
 ```bash
-curl -H "Authorization: token ghp_your_token_here" -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
+curl -H "Authorization: token ghp_your_token_here" \
+  -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
+  -o /tmp/install-wlan.sh && \
+sudo bash /tmp/install-wlan.sh && \
+rm /tmp/install-wlan.sh
 ```
 
 Replace `ghp_your_token_here` with your actual token.
@@ -148,10 +156,18 @@ To update to the latest release:
 
 ```bash
 # If token is saved in your profile
-curl -H "Authorization: token $GITHUB_TOKEN" -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
+  -o /tmp/install-wlan.sh && \
+sudo bash /tmp/install-wlan.sh && \
+rm /tmp/install-wlan.sh
 
 # Or with inline token
-curl -H "Authorization: token ghp_your_token_here" -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
+curl -H "Authorization: token ghp_your_token_here" \
+  -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
+  -o /tmp/install-wlan.sh && \
+sudo bash /tmp/install-wlan.sh && \
+rm /tmp/install-wlan.sh
 ```
 
 The installer automatically detects if you have an older version and upgrades it.
@@ -195,13 +211,21 @@ If you encounter issues not covered in this guide:
 
 ```bash
 # Install (with saved token)
-curl -H "Authorization: token $GITHUB_TOKEN" -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
+  -o /tmp/install-wlan.sh && \
+sudo bash /tmp/install-wlan.sh && \
+rm /tmp/install-wlan.sh
 
 # Run
 sudo wlan-autoroam
 
 # Update
-curl -H "Authorization: token $GITHUB_TOKEN" -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh | sudo -E bash
+curl -H "Authorization: token $GITHUB_TOKEN" \
+  -fsSL https://raw.githubusercontent.com/jwil007/wlan-autoroam-release/main/install.sh \
+  -o /tmp/install-wlan.sh && \
+sudo bash /tmp/install-wlan.sh && \
+rm /tmp/install-wlan.sh
 
 # Uninstall
 sudo rm /usr/local/bin/wlan-autoroam
