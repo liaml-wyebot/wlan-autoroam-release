@@ -136,8 +136,32 @@ if [ -f "$INSTALL_DIR/$BINARY_NAME" ]; then
     fi
 fi
 
-# Download URL (works for both public and private repos)
-DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
+# Download URL
+if [ -n "$AUTH_HEADER" ]; then
+    # For private repos, get asset ID and use API endpoint
+    info "Getting asset download URL from GitHub API..."
+    ASSET_NAME="wlan-autoroam-$PLATFORM"
+    
+    # Get release info and extract asset ID
+    if command -v curl &> /dev/null; then
+        RELEASE_DATA=$(curl -s -H "$AUTH_HEADER" "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE")
+        ASSET_ID=$(echo "$RELEASE_DATA" | grep -B 3 "\"name\": \"$ASSET_NAME\"" | grep '"id"' | head -1 | grep -o '[0-9]*')
+    elif command -v wget &> /dev/null; then
+        RELEASE_DATA=$(wget --header="$AUTH_HEADER" -qO- "https://api.github.com/repos/$REPO/releases/tags/$LATEST_RELEASE")
+        ASSET_ID=$(echo "$RELEASE_DATA" | grep -B 3 "\"name\": \"$ASSET_NAME\"" | grep '"id"' | head -1 | grep -o '[0-9]*')
+    fi
+    
+    if [ -z "$ASSET_ID" ]; then
+        error "Failed to find asset $ASSET_NAME in release $LATEST_RELEASE"
+    fi
+    
+    # Use API endpoint for downloading assets from private repos
+    DOWNLOAD_URL="https://api.github.com/repos/$REPO/releases/assets/$ASSET_ID"
+else
+    # Public repos use direct download URL
+    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$LATEST_RELEASE/wlan-autoroam-$PLATFORM"
+fi
+
 
 
 # Download binary (try curl first, fallback to wget)
