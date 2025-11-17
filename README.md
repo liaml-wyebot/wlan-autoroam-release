@@ -1,6 +1,6 @@
 # wlan-autoroam
+!!!!Since this is a private repo - you must follow this guide to download and install the software: [INTERNAL_INSTALL.md](INTERNAL_INSTALL.md)!!!!
 
-Automated Wi-Fi roaming testing and analysis with an agentic AI assistant. Validate mobility performance, visualize results, or just hang out with RoamBot. 
 > [!IMPORTANT]
 > **AI Features Require Your Own API Key**: RoamBot needs an LLM provider (OpenAI, Anthropic, OpenRouter, or local Ollama/LM Studio). Basic roaming tests work without AI. See the [AI analysis section](#ai-analysis-roambot) for configuration.
 
